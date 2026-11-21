@@ -12,9 +12,15 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
-      - name: Ekstrak project
-        run: unzip -o asisten-app.zip
+      - name: Ekstrak project (zip terbaru menimpa yang lama)
+        run: |
+          git log --reverse --diff-filter=A --name-only --pretty=format: -- '*.zip' | awk 'NF' | awk '!seen[$0]++' | while IFS= read -r f; do
+            if [ -f "$f" ]; then echo "Ekstrak: $f"; unzip -qo "$f"; fi
+          done
+          ls asisten-app/app/src/main/java/com/example/asisten
 
       - uses: actions/setup-java@v4
         with:
